@@ -1,18 +1,44 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { axios } from "axios";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+
 export default function Loginpage() {
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
-  const onLogin = async () => {};
+  const router = useRouter();
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const onLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/users/login", user);
+      console.log(response);
+      toast.success("Login Success");
+      router.push("/profile");
+    } catch (error:any) {
+      console.log("Signup failed: ", error.response.data.error);
+      toast.error(error.response.data.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
   return (
     <div className="m-4">
-      <h1 className="text-center">Login</h1>
-      <form className="max-w-md mx-auto">
+      <Toaster />
+      <h1 className="text-center">{loading ? "Loading..." : "Login"}</h1>
+      <div className="max-w-md mx-auto">
         <div className="relative z-0 w-full mb-5 group">
           <input
             type="email"
@@ -52,15 +78,15 @@ export default function Loginpage() {
         </div>
         <button
           onClick={onLogin}
-          type="submit"
+          
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Submit
+          {buttonDisabled ? "Fill fields" : "Login"}
         </button>
         <div>
           Don't have an account? <Link href="/signup">Signup here</Link>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

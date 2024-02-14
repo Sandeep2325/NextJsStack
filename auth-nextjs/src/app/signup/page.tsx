@@ -1,19 +1,49 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { axios } from "axios";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 export default function SignupPage() {
+  const router = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
     username: "",
   });
-  const onSignup = async () => {};
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const onSignup = async () => {
+    try {
+      setLoading(true);
+
+      const response = await axios.post("/api/users/signup", user);
+      console.log("signup process", response.data);
+      router.push("/login");
+    } catch (error:any) {
+      console.log("Signup failed: ", error.response.data.error);
+      toast.error(error.response.data.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      user.email.length > 0 &&
+      user.username.length > 0 &&
+      user.password.length > 0
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
   return (
     <div className="m-4">
-      <h1 className="text-center">Signup</h1>
-      <form className="max-w-md mx-auto">
+      <Toaster />
+      <h1 className="text-center">{loading ? "Loading..." : "Signup"}</h1>
+      <div className="max-w-md mx-auto">
         <div className="relative z-0 w-full mb-5 group">
           <input
             type="text"
@@ -72,15 +102,14 @@ export default function SignupPage() {
         </div>
         <button
           onClick={onSignup}
-          type="submit"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Submit
+          {buttonDisabled ? "Fill fields" : "Signup"}
         </button>
         <div>
           Already have an account? <Link href="/login">Login here</Link>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
