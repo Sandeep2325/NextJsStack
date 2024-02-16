@@ -85,7 +85,10 @@ export default function Loginpage() {
           {buttonDisabled ? "Fill fields" : "Login"}
         </button>
         <div>
-          Don't have an account? <Link href="/signup">Signup here</Link>
+          Don't have an account? <Link href="/signup">Signup</Link>
+        </div>
+        <div>
+         Forgot Password? <Link href="/resetpassword">click here</Link>
         </div>
       </div>
     </div>
