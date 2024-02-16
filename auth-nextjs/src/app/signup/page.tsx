@@ -106,7 +106,7 @@ export default function SignupPage() {
           {buttonDisabled ? "Fill fields" : "Signup"}
         </button>
         <div>
-          Already have an account? <Link href="/login">Login here</Link>
+          {"Already have an account? "}<Link href="/login">{"Login here"}</Link>
         </div>
       </div>
     </div>
